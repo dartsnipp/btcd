@@ -1128,6 +1128,13 @@ func opcodeCheckSequenceVerify(op *parsedOpcode, vm *Engine) error {
 		return err
 	}
 
+	// Note that elsewhere numeric opcodes are limited to operands in the range
+	// -2**31+1 to 2**31-1, however it is legal for opcodes to produce results
+	// exceeding that range. This limitation is implemented by scriptNum's
+  // default 4-byte limit.
+	// Thus as a special case we tell scriptNum to accept up to 5-byte bignums,
+	// which are good until 2**39-1, well beyond the 2**32-1 limit of the
+	// nSequence field itself.
 	stackSequence, err := makeScriptNum(so, vm.dstack.verifyMinimalData, 5)
 	if err != nil {
 		return err
@@ -1155,7 +1162,7 @@ func opcodeCheckSequenceVerify(op *parsedOpcode, vm *Engine) error {
 	txSequence := int64(vm.tx.TxIn[vm.txIdx].Sequence)
 	if txSequence&int64(wire.SequenceLockTimeDisabled) != 0 {
 		return fmt.Errorf("transaction sequence has sequence "+
-			"locktime disabled bit enabled: 0x%x", txSequence)
+			"locktime disabled bit set: 0x%x", txSequence)
 	}
 
 	lockTimeMask := int64(wire.SequenceLockTimeSeconds |

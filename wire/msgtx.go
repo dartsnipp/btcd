@@ -34,7 +34,7 @@ const (
 	// seconds.
 	SequenceLockTimeSeconds uint32 = 1 << 22
 
-	// SequenceLockTimeMask is a flag that extracts the relative locktime
+	// SequenceLockTimeMask is a mask that extracts the relative locktime
 	// when masked against the transaction input sequence number.
 	SequenceLockTimeMask uint32 = 0x0000ffff
 
